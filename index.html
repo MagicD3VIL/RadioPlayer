@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+
+<!--
+Licensed under the Academic Free License version 3.0
+Copyright (c) 2021 Michael Slíva <michael@sliva.dev>
+-->
+
+<html lang="en">
+	<head>
+		<title>MagicD3VIL's Radio Player</title>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+		<link rel="preload" href="./css/style.css" as="style">
+		<link rel="preload" href="./css/radio.css" as="style">
+		<link rel="stylesheet" href="./css/style.css">
+		<link rel="stylesheet" href="./css/radio.css">
+		<link rel="stylesheet" href="./css/jquery.modal.css">
+		<link rel="stylesheet" href="./css/fa.all.min.css">
+		<link rel='shortcut icon' type="image/x-icon" href='./favicon.ico'>
+		<link href="https://fonts.googleapis.com/css2?family=Exo+2&family=Lato&family=Montserrat&family=Ubuntu&family=IBM+Plex+Mono&display=swap" rel="stylesheet">	
+	</head>
+
+	<body>
+		<script>0</script> <!-- FOUC fix -->
+		<div id="deadCenter">
+			<div id="radioPlayerContainer">
+			<!-- MagicD3VIL's Radio Player -->
+				<div id="MagicPlayer">
+					<div id="playerInfo"><div id="playerInfoHeading">PLAYING: &nbsp;</div><div id="playerInfoPlayingContainer"><span id="playerInfoPlaying" class="marquee"></span></div></div>
+					<div id="playerMiddleLine"><p id="radioPlayer"><i onclick="radioPlayerPlay()" class="fa fa-play-circle"></i><i onclick="radioPlayerPause()" class="fa fa-pause-circle"></i><span class="span8">&nbsp;</span><input id="volume" type="range" min="0" max="100" step="1" oninput="setVolume(this.value)" onchange="setVolume(this.value)"><span class="span8">&nbsp;</span> 
+					<div id="equaliser-container"> <ol class="equaliser-column"> <li class="colour-bar"></li> </ol> <ol class="equaliser-column"> <li class="colour-bar"></li> </ol> <ol class="equaliser-column"> <li class="colour-bar"></li> </ol> <ol class="equaliser-column"> <li class="colour-bar"></li> </ol> <ol class="equaliser-column"> <li class="colour-bar"></li> </ol></div>
+					<span class="rememberHelp" id="playerAbout" title="MagicD3VIL's Radio Player"><i style ="font-size:1rem" class="far fa-question-circle"></i></span></div><div id="currentVolume"></div>
+					<div id="playerBottomLine"><p id="playerRememberHelp"><span class="rememberHelp" title="If you check this box, next time when you load or refresh this page your set volume will remain the same."><input type="checkbox" id="rememberVolume" onclick="rememberCheck()"/> Remember volume</span></p><div id="playerLogo"><p id="playerClanhouseLogo"><a href="https://clanhouse.eu" target="_blank"><img src="./clanhouse_24x28.png" alt="Clanhouse.eu Logo"></a></p><p id="playerJetstreamLogo"><a href="https://jetstreamradio.com/" target="_blank"><img src="./jetstream_28x28.png" alt="JetStream Radio Logo"></a></p></div>
+					<audio id="radio" preload="none">Your browser does not support <code>&lt;audio&gt;</code> element</audio></div>
+				</div>
+			<!-- END MagicD3VIL's Radio Player -->
+			</div>
+		</div>
+						
+		<div class="linkButtons">
+			<div title="Project source code on GitHub" id="githubButton"><i onclick='window.open("https://github.com/MagicD3VIL/RadioPlayer", "_blank");' class="fab fa-github"></i></div>
+		</div>
+		
+		<div class="toggleButtons">
+			<div title="Darkmode" id="darkmodeToggle"><i onclick="setDarkmode()" class="fas fa-lightbulb"></i></div>
+			<div title="Download the m3u file for your own player" id="downloadButton"><i onclick='window.open("https://listen.jetstreamradio.com:8000/autodj.m3u", "_blank");' class="fas fa-download"></i></div>
+			<div title="History" id="historyButton"><i onclick="historyModalOpen()" class="fas fa-history"></i></div>
+			<div title="Timer"><svg id="timerButton" onclick="timerModalOpen()" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M6.5 0a.5.5 0 0 0 0 1H7v1.07a7.001 7.001 0 0 0-3.273 12.474l-.602.602a.5.5 0 0 0 .707.708l.746-.746A6.97 6.97 0 0 0 8 16a6.97 6.97 0 0 0 3.422-.892l.746.746a.5.5 0 0 0 .707-.708l-.601-.602A7.001 7.001 0 0 0 9 2.07V1h.5a.5.5 0 0 0 0-1h-3zm1.038 3.018a6.093 6.093 0 0 1 .924 0 6 6 0 1 1-.924 0zM8.5 5.5a.5.5 0 0 0-1 0v3.362l-1.429 2.38a.5.5 0 1 0 .858.515l1.5-2.5A.5.5 0 0 0 8.5 9V5.5zM0 3.5c0 .753.333 1.429.86 1.887A8.035 8.035 0 0 1 4.387 1.86 2.5 2.5 0 0 0 0 3.5zM13.5 1c-.753 0-1.429.333-1.887.86a8.035 8.035 0 0 1 3.527 3.527A2.5 2.5 0 0 0 13.5 1z"/></svg></div>
+		</div>
+		
+		<!-- SCRIPTS -->
+			<script src="./js/jquery-3.4.1.min.js"></script>
+			<script src="./js/jquery.modal.min.js"></script>
+			<!-- HISTORY -->
+				<script>
+					let history = new Array(9);
+					let historyStamp = new Array(9);
+					
+					function printHistory() {
+						var historyHTML = "";
+						for (var i = 0; (i < 10) && (i <= history.length) && (history[i] !== undefined); i++) {
+							historyHTML += "<p>" + historyStamp[i] + history[i] + "</p>";
+							
+						}
+						
+						$("#songList").html(historyHTML);
+					}
+					
+					function historyModalOpen() {
+						$("#historyModal").modal({
+						  fadeDuration: 585,
+						});
+						printHistory();
+					}
+					
+					function songToHistory(song) {
+						if ((song !== "") && (song !== undefined) && !(song.includes("Warning:") || song.includes("Error:"))) {
+							if (history[0] != song) {
+								for (var i = 8; i >= 0; i--) {
+									history[i+1] = history[i];
+									historyStamp[i+1] = historyStamp[i];
+								}
+								var timestamp = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', hour12: false});
+								history[0] = song;
+								historyStamp[0] = "<code>" + timestamp + "</code> | ";
+								printHistory();
+							}
+						}
+					}
+				</script>
+			<!-- END HISTORY -->
+			<!-- MagicD3VIL's Radio Player -->
+				<script>
+					var rememberVolume = document.getElementById("rememberVolume");
+					var radio = document.getElementById("radio");	
+					var streamURL = "https://listen.jetstreamradio.com:8000/autodj" + getTime();
+					var helpMoveTimer;
+					var playerResizeTimer;
+					var playerResizeTimer2;
+					var currentlyPlayingTimer;
+					
+					var animationTimer;
+					var animationTimerTime = 0;
+					
+					var w = 245 - $("#playerInfoHeading").width();
+					$("#playerInfoPlaying").css("min-width", w);
+					
+					var d = new Date();
+					var expireDays = 3650;
+					d.setTime(d.getTime() + (expireDays*24*60*60*1000));
+					var expires = "expires="+ d.toUTCString();
+					
+					function getTime() {
+						var r = "?time=" + new Date().getTime();
+						return r;
+					}
+					
+					function getCookieValue(cname) {
+					  var name = cname + "=";
+					  var decodedCookie = decodeURIComponent(document.cookie);
+					  var ca = decodedCookie.split(';');
+					  for(var i = 0; i < ca.length; i++) {
+						var c = ca[i];
+						while (c.charAt(0) == ' ') {
+						  c = c.substring(1);
+						}
+						if (c.indexOf(name) == 0) {
+						  return c.substring(name.length, c.length);
+						}
+					  }
+					  return "";
+					}
+					
+					function getBoolRememberVolume() {
+						var result = Number(getCookieValue("rememberVolume"));
+						if (result == 1) {
+							return true;
+						} else {
+							return false;
+						}
+					}
+					
+					function resetVolume() {
+						if (!getBoolRememberVolume()){
+							radio.volume = 0.25;
+							document.getElementById("volume").value = "25";
+							rememberVolume.checked = false;
+						} else {
+							var savedVolume = Number(getCookieValue("savedVolume"));
+							radio.volume = savedVolume;
+							document.getElementById("volume").value = String(savedVolume * 100);
+							rememberVolume.checked = true;
+						}
+					}
+					
+					resetVolume();
+					
+					function getVolume() {
+						if (!getBoolRememberVolume()){
+							return 0.25;
+						} else {
+							return Number(getCookieValue("savedVolume"));
+						}
+					}
+					
+					function radioPlayerPause() {
+							$("#radio").animate({volume: 0}, 2000);
+							setTimeout(function(){
+								radio.pause();
+								radio.setAttribute("src", "");
+								setTimeout(function() { 
+									radio.load(); // This stops the stream from downloading
+								});
+							}, 2000);
+							clearInterval(currentlyPlayingTimer);
+							$(".fa-pause-circle").css("display", "none");
+							$(".fa-play-circle").css("display", "initial");
+							$("#equaliser-container").css("opacity", 0);
+							$("#playerInfo").css("transition", "opacity 1s ease");
+							$("#playerInfo").css("opacity", 0);
+							$("#playerAbout").css("animation", "helpMoveClickPause 0.5s ease 1.5s");
+							if ((animationTimerTime) >= 5 && (animationTimerTime <= 10)) {
+								$("#playerClanhouseLogo").css("animation", "playerLogoFadeStopClan 3s");
+								$("#playerJetstreamLogo").css("animation", "playerLogoFadeStopJet 3s 0s");
+							} else {
+								$("#playerClanhouseLogo").css("animation", "playerLogoFadeStop 3s");
+								$("#playerJetstreamLogo").css("animation", "");
+							}
+							playerResizeTimer = setTimeout(function(){
+								$("#playerMiddleLine").css("top", "-24px");
+								$("#playerBottomLine").css("top", "-24px");
+								$("#currentVolume").css("top", "-24px");
+								$("#MagicPlayer").css("height", "76px");
+							}, 1000);
+							playerResizeTimer2 = setTimeout(function(){
+								$("#MagicPlayer").css("width", "228px");
+								$("#playerLogo").css("left", "0px");
+							}, 1500);
+							helpMoveTimer = setTimeout(function(){
+								$("#playerAbout").css("left", "-22px");
+							}, 2000);
+							clearInterval(animationTimer);
+							
+							$(".equaliser-column:nth-child(1) .colour-bar").css("animation", "color-bar-paused 2s 1s ease-out alternate infinite");
+							$(".equaliser-column:nth-child(2) .colour-bar").css("animation", "color-bar-paused 2s 0.5s ease-out alternate infinite");
+							$(".equaliser-column:nth-child(3) .colour-bar").css("animation", "color-bar-paused 2s 1.5s ease-out alternate infinite");
+							$(".equaliser-column:nth-child(4) .colour-bar").css("animation", "color-bar-paused 2s 0.375s ease-out alternate infinite");
+							$(".equaliser-column:nth-child(5) .colour-bar").css("animation", "color-bar-paused 2s 2s ease-out alternate infinite");
+					}
+					
+					function radioPlayerPlay() {
+							clearTimeout(helpMoveTimer);
+							clearTimeout(playerResizeTimer);
+							clearTimeout(playerResizeTimer2);
+							animationTimer = setInterval(currentAnimation, 1000);
+							radio.setAttribute("src", streamURL);
+							radio.load();
+							radio.play();
+							$("#radio").animate({volume: 0}, 0);
+							$("#radio").animate({volume: getVolume()}, 2000);
+							$(".fa-play-circle").css("display", "none");
+							$(".fa-pause-circle").css("display", "initial");
+							$("#playerAbout").css("animation", "helpMoveClickPlay 0.5s ease");
+							$("#playerAbout").css("left", "0px");
+							$("#equaliser-container").css("opacity", 1);
+							$("#MagicPlayer").css("height", "100px");
+							$("#MagicPlayer").css("width", "245px");
+							$("#playerLogo").css("left", "17px");
+							$("#playerMiddleLine").css("top", "0px");
+							$("#playerBottomLine").css("top", "0px");
+							$("#currentVolume").css("top", "0px");
+							$("#playerInfo").css("transition", "opacity 3s ease-in");
+							$("#playerInfo").css("opacity", 1);
+							$("#playerClanhouseLogo").css("animation", "playerLogoFade 10s infinite");
+							$("#playerJetstreamLogo").css("animation", "playerLogoFade 10s 5s infinite");
+							currentlyPlaying();
+							currentlyPlayingTimer = setInterval(currentlyPlaying, 10000);
+							
+							$(".equaliser-column:nth-child(1) .colour-bar").css("animation", "color-bar-playing 2s 1s ease-out alternate infinite");
+							$(".equaliser-column:nth-child(2) .colour-bar").css("animation", "color-bar-playing 2s 0.5s ease-out alternate infinite");
+							$(".equaliser-column:nth-child(3) .colour-bar").css("animation", "color-bar-playing 2s 1.5s ease-out alternate infinite");
+							$(".equaliser-column:nth-child(4) .colour-bar").css("animation", "color-bar-playing 2s 0.375s ease-out alternate infinite");
+							$(".equaliser-column:nth-child(5) .colour-bar").css("animation", "color-bar-playing 2s 2s ease-out alternate infinite");
+					}
+					
+					function setVolume(val) {
+						clearTimeout(fadeoutTimer);
+						radio.volume = val / 100;
+						if (getBoolRememberVolume()) {
+							document.cookie = "savedVolume=" + radio.volume + ";" + expires + ";path=/;Secure";
+						}
+						$("#currentVolume").css("transition", "top 0.5s ease 0s, opacity 0.5s ease 0s");
+						$("#currentVolume").css("opacity", 1);
+						document.getElementById("currentVolume").innerHTML = "Volume: " + val + "%";
+						var fadeoutTimer = setTimeout(function(){
+							$("#currentVolume").css("transition", "top 0.5s ease 0s, opacity 2.5s cubic-bezier(.17,.84,.44,1) 2s");
+							$("#currentVolume").css("opacity", 0);
+						}, 500);
+					}
+					
+					function rememberCheck() {
+						if (rememberVolume.checked){
+							document.cookie = "rememberVolume=1;" + expires + ";path=/;Secure";
+							document.cookie = "savedVolume=" + radio.volume + ";" + expires + ";path=/;Secure";
+						} else {
+							document.cookie = "rememberVolume=0;" + expires + ";path=/;Secure";
+						}
+					}
+					function currentlyPlaying() {
+						
+						var songGetter = "./playing.php" + getTime();
+						$.ajax({
+							url: songGetter,
+							dataType: "text",
+							success: function(currentSong) {
+								$( "#playerInfoPlaying" ).text(currentSong);
+								songToHistory(currentSong);
+							}
+						});
+						
+					}
+					
+					function currentAnimation() {
+						animationTimerTime++;
+						if (animationTimerTime === 10) {
+							animationTimerTime = 0;
+						}
+					}
+					
+					document.getElementById('playerAbout').title = "MagicD3VIL's Radio Player\nLicensed under the Academic Free License version 3.0\nCopyright (c) 2021 Michael Slíva <michael@sliva.dev>";
+				</script>
+			<!-- END MagicD3VIL's Radio Player -->
+			<!-- NIGHTMODE -->
+				<script>
+					function getDarkmode() {
+						var result = Number(getCookieValue("darkmode"));
+						if (result == 1) {
+							return true;
+						} else {
+							return false;
+						}
+					}
+					
+					function setDarkmode() {
+						if (!getDarkmode()) {
+							$("html").css("background-color", "#303030");
+							$("body").css("background-color", "#303030");
+							$("#githubButton").css("color", "#FFD034");
+							$("#darkmodeToggle").css("color", "#FFD034");
+							$("#historyButton").css("color", "#FFD034");
+							$("#timerButton").css("fill", "#FFD034");
+							$("#downloadButton").css("color", "#FFD034");
+							$("#MagicPlayer").css("border-color", "transparent");
+							document.cookie = "darkmode=" + 1 + ";" + expires + ";path=/;Secure";
+						}
+						else {
+							$("html").css("background-color", "white");
+							$("body").css("background-color", "white");
+							$("#githubButton").css("color", "#585858");	
+							$("#darkmodeToggle").css("color", "#585858");	
+							$("#historyButton").css("color", "#585858");	
+							$("#timerButton").css("fill", "#585858");	
+							$("#downloadButton").css("color", "#585858");	
+							$("#MagicPlayer").css("border-color", "initial");
+							document.cookie = "darkmode=" + 0 + ";" + expires + ";path=/;Secure";
+						}
+					}
+					
+					if (getDarkmode()) {
+						$("html").css("background-color", "#303030");
+						$("body").css("background-color", "#303030");
+						$("#githubButton").css("color", "#FFD034");
+						$("#darkmodeToggle").css("color", "#FFD034");
+						$("#historyButton").css("color", "#FFD034");
+						$("#timerButton").css("fill", "#FFD034");
+						$("#downloadButton").css("color", "#FFD034");
+						$("#MagicPlayer").css("border-color", "transparent");
+					}
+					
+					$("#githubButton").mouseover(function() {
+						if (getDarkmode()) {
+							$(this).css("color","white");
+						}
+						else {
+							$(this).css("color","black");
+						}	
+					}).mouseout(function() {
+						if (getDarkmode()) {
+							$(this).css("color","#FFD034");
+						}
+						else {
+							$(this).css("color","#585858");
+						}	
+					});
+					
+					$("#darkmodeToggle").mouseover(function() {
+						if (getDarkmode()) {
+							$(this).css("color","white");
+						}
+						else {
+							$(this).css("color","black");
+						}	
+					}).mouseout(function() {
+						if (getDarkmode()) {
+							$(this).css("color","#FFD034");
+						}
+						else {
+							$(this).css("color","#585858");
+						}	
+					});
+					
+					$("#historyButton").mouseover(function() {
+						if (getDarkmode()) {
+							$(this).css("color","white");
+						}
+						else {
+							$(this).css("color","black");
+						}	
+					}).mouseout(function() {
+						if (getDarkmode()) {
+							$(this).css("color","#FFD034");
+						}
+						else {
+							$(this).css("color","#585858");
+						}	
+					});
+					
+					$("#timerButton").mouseover(function() {
+						if (getDarkmode()) {
+							$(this).css("fill","white");
+						}
+						else {
+							$(this).css("fill","black");
+						}	
+					}).mouseout(function() {
+						if (getDarkmode()) {
+							$(this).css("fill","#FFD034");
+						}
+						else {
+							$(this).css("fill","#585858");
+						}	
+					});
+					
+					$("#downloadButton").mouseover(function() {
+						if (getDarkmode()) {
+							$(this).css("color","white");
+						}
+						else {
+							$(this).css("color","black");
+						}	
+					}).mouseout(function() {
+						if (getDarkmode()) {
+							$(this).css("color","#FFD034");
+						}
+						else {
+							$(this).css("color","#585858");
+						}	
+					});
+					
+				</script>
+			<!-- END NIGHTMODE -->
+			<!-- TIMER -->
+				<script>
+					var timer = 0;
+					var timerMinutes = false;
+					var timerRemainingMinutes = 0;
+					var timerRemainingSeconds = 0;
+					var timerRemainingHours = 0;
+					var timerRemainingMinutesInterval;
+					var timerRemainingSecondsInterval;
+					var timerTimeout;
+					
+					var timerIntervalMinute = 60000; // 1 minute in ms
+					var timerIntervalSecond = 1000; // 1 second in ms
+					var timerIntervalHour = 3600000; // 1 second in ms
+					
+					function timerModalOpen() {
+						$("#timerModal").modal({
+						  fadeDuration: 585,
+						});
+					}
+					
+					
+					function timerRemainingMinutesDecrease() {
+						timerMinutes--;
+						if (timerMinutes < 0) {
+								timer = 0;
+								timerMinutes = false;
+								timerRemainingMinutes = 0;
+								timerRemainingSeconds = 0;
+								timerRemainingHours = 0;
+								clearInterval(timerRemainingSecondsInterval);
+								$("#timerLeft").text("");
+								clearInterval(timerRemainingMinutesInterval);
+						}
+						if (timerRemainingHours > 0) {
+							if (timerRemainingMinutes <= 0) {
+								timerRemainingMinutes = 60;
+								timerRemainingHours--;
+							}
+							else if (timerRemainingMinutes > 60) {
+								timerRemainingMinutes = 60;
+							}
+						}
+						timerRemainingMinutes--;
+					}
+					
+					function timerRemainingSecondsDecrease() {
+						if (timerRemainingSeconds <= 0)
+							timerRemainingSeconds = 60;
+						else if (timerRemainingSeconds > 60) {
+							timerRemainingSeconds = 60;
+						}
+						timerRemainingSeconds--;
+						var timerLeftText = "Time left before radio stops: ";
+						if ((timerRemainingHours > 0) && (timerRemainingHours >= 10)) {
+							timerLeftText += timerRemainingHours + ":";
+						}
+						else if ((timerRemainingHours > 0) && (timerRemainingHours < 10)) {
+							timerLeftText += "0" + timerRemainingHours + ":";
+						}
+						if (timerRemainingMinutes >= 10) {
+							timerLeftText += timerRemainingMinutes + ":";
+						}
+						else {
+							timerLeftText += "0" + timerRemainingMinutes + ":";
+						}
+						if (timerRemainingSeconds >= 10) {
+							timerLeftText += timerRemainingSeconds;
+						}
+						else {
+							timerLeftText += "0" + timerRemainingSeconds;
+						}
+						$("#timerLeft").text(timerLeftText);
+					}
+					
+					function timerShowRemaining() {
+						if (timerMinutes != false) {
+							timerRemainingSeconds = 59;
+							timerRemainingMinutes--;
+							if (timerRemainingMinutes > 59) {
+								timerRemainingHours = Math.floor(timerRemainingMinutes / 60);
+								timerRemainingMinutes = timerRemainingMinutes % 60;
+							}
+							timerRemainingMinutesInterval = setInterval(timerRemainingMinutesDecrease, timerIntervalMinute);
+							timerRemainingSecondsInterval = setInterval(timerRemainingSecondsDecrease, timerIntervalSecond);
+							timerMinutes--;
+						}
+					}
+					
+					function timerSet() {
+						if (timer != 0) {
+							timerClear();
+						}
+						timerMinutes = parseInt($("#timerNumber").val());
+						timerRemainingMinutes = timerMinutes;
+						timer = timerMinutes * timerIntervalMinute;
+						timerShowRemaining();
+						timerTimeout = setTimeout(radioPlayerPause, timer);
+					}
+					
+					function timerClear() {
+						clearTimeout(timerTimeout);
+						timer = 0;
+						timerMinutes = false;
+						timerRemainingMinutes = 0;
+						timerRemainingSeconds = 0;
+						timerRemainingHours = 0;
+						$("#timerLeft").text("");
+						clearInterval(timerRemainingSecondsInterval);
+						clearInterval(timerRemainingMinutesInterval);
+					}
+				</script>
+			<!-- END TIMER -->
+		<!-- END SCRIPTS -->
+		
+		<!-- MODAL WINDOWS -->
+			<div id="timerModal" class="modal">
+				<h2>Set the player timer</h2>
+				<hr>
+				<span id="timerLeft"></span>
+				<form class="formColumn">
+				<div class="nameColumn">
+					<label for="timerNumber">Minutes</label>
+				</div>
+				<div class="inputColumn">
+					<input type="number" id="timerNumber" name="timerNumber" min="1" max="1440" placeholder="30" required>
+					</div>
+				</form>
+				<div class="buttonContainer">
+					<a class="btn" href="#" rel="modal:close">Close</a>
+					<a class="btn" href="#" onclick="timerClear()">Reset timer</a>
+					<a class="btn" href="#" onclick="timerSet()">Set timer</a>
+				</div>
+			</div>
+			
+			<div id="historyModal" class="modal">
+				<h2>Song history</h2>
+				<hr>
+				<div id="songList">
+					
+				</div>
+				<div class="buttonContainer">
+					<a class="btn" href="#" rel="modal:close">Close</a>
+				</div>
+			</div>
+		<!-- END MODAL WINDOWS -->
+	</body>
+</html>

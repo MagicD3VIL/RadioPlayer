@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+
+<!--
+Licensed under the Academic Free License version 3.0
+Copyright (c) 2021 Michael Slíva <michael@sliva.dev>
+-->
+
+<html lang="en">
+	<head>
+		<title>MagicD3VIL's Radio Player</title>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+		<link rel="preload" href="./css/style.css" as="style">
+		<link rel="preload" href="./css/radio.css" as="style">
+		<link rel="stylesheet" href="./css/style.css">
+		<link rel="stylesheet" href="./css/radio.css">
+		<link rel="stylesheet" href="./css/fa.all.min.css">
+		<link rel='shortcut icon' type="image/x-icon" href='./favicon.ico'>
+		<link href="https://fonts.googleapis.com/css2?family=Exo+2&family=Lato&family=Montserrat&family=Ubuntu&family=IBM+Plex+Mono&display=swap" rel="stylesheet">	
+	</head>
+	
+	<body>
+		<script>0</script>
+		
+		<!-- MagicD3VIL's Radio Player -->
+			<div id="MagicPlayer">
+				<div id="playerInfo"><div id="playerInfoHeading">PLAYING: &nbsp;</div><div id="playerInfoPlayingContainer"><span id="playerInfoPlaying" class="marquee"></span></div></div>
+				<div id="playerMiddleLine"><p id="radioPlayer"><i onclick="radioPlayerPlay()" class="fa fa-play-circle"></i><i onclick="radioPlayerPause()" class="fa fa-pause-circle"></i><span class="span8">&nbsp;</span><input id="volume" type="range" min="0" max="100" step="1" oninput="setVolume(this.value)" onchange="setVolume(this.value)"><span class="span8">&nbsp;</span> 
+				<div id="equaliser-container"> <ol class="equaliser-column"> <li class="colour-bar"></li> </ol> <ol class="equaliser-column"> <li class="colour-bar"></li> </ol> <ol class="equaliser-column"> <li class="colour-bar"></li> </ol> <ol class="equaliser-column"> <li class="colour-bar"></li> </ol> <ol class="equaliser-column"> <li class="colour-bar"></li> </ol></div>
+				<span class="rememberHelp" id="playerAbout" title="MagicD3VIL's Radio Player"><i style ="font-size:1rem" class="far fa-question-circle"></i></span></div><div id="currentVolume"></div>
+				<div id="playerBottomLine"><p id="playerRememberHelp"><span class="rememberHelp" title="If you check this box, next time when you load or refresh this page your set volume will remain the same."><input type="checkbox" id="rememberVolume" onclick="rememberCheck()"/> Remember volume</span></p><div id="playerLogo"><p id="playerClanhouseLogo"><a href="https://clanhouse.eu" target="_blank"><img src="./clanhouse_24x28.png" alt="Clanhouse.eu Logo"></a></p><p id="playerJetstreamLogo"><a href="https://jetstreamradio.com/" target="_blank"><img src="./jetstream_28x28.png" alt="JetStream Radio Logo"></a></p></div>
+				<audio id="radio" preload="none">Your browser does not support <code>&lt;audio&gt;</code> element</audio></div>
+			</div>
+		<!-- END MagicD3VIL's Radio Player -->
+		
+		<!-- SCRIPTS -->
+			<script src="./js/jquery-3.4.1.min.js"></script>
+			<script src="./js/jquery.modal.min.js"></script>
+		
+			<!-- MagicD3VIL's Radio Player -->
+				<script>
+					var rememberVolume = document.getElementById("rememberVolume");
+					var radio = document.getElementById("radio");	
+					var streamURL = "https://listen.jetstreamradio.com:8000/autodj" + getTime();
+					var helpMoveTimer;
+					var playerResizeTimer;
+					var playerResizeTimer2;
+					var currentlyPlayingTimer;
+					
+					var animationTimer;
+					var animationTimerTime = 0;
+					
+					var w = 245 - $("#playerInfoHeading").width();
+					$("#playerInfoPlaying").css("min-width", w);
+					
+					var d = new Date();
+					var expireDays = 3650;
+					d.setTime(d.getTime() + (expireDays*24*60*60*1000));
+					var expires = "expires="+ d.toUTCString();
+					
+					function getTime() {
+						var r = "?time=" + new Date().getTime();
+						return r;
+					}
+					
+					function getCookieValue(cname) {
+					  var name = cname + "=";
+					  var decodedCookie = decodeURIComponent(document.cookie);
+					  var ca = decodedCookie.split(';');
+					  for(var i = 0; i < ca.length; i++) {
+						var c = ca[i];
+						while (c.charAt(0) == ' ') {
+						  c = c.substring(1);
+						}
+						if (c.indexOf(name) == 0) {
+						  return c.substring(name.length, c.length);
+						}
+					  }
+					  return "";
+					}
+					
+					function getBoolRememberVolume() {
+						var result = Number(getCookieValue("rememberVolume"));
+						if (result == 1) {
+							return true;
+						} else {
+							return false;
+						}
+					}
+					
+					function resetVolume() {
+						if (!getBoolRememberVolume()){
+							radio.volume = 0.25;
+							document.getElementById("volume").value = "25";
+							rememberVolume.checked = false;
+						} else {
+							var savedVolume = Number(getCookieValue("savedVolume"));
+							radio.volume = savedVolume;
+							document.getElementById("volume").value = String(savedVolume * 100);
+							rememberVolume.checked = true;
+						}
+					}
+					
+					resetVolume();
+					
+					function getVolume() {
+						if (!getBoolRememberVolume()){
+							return 0.25;
+						} else {
+							return Number(getCookieValue("savedVolume"));
+						}
+					}
+					
+					function radioPlayerPause() {
+							$("#radio").animate({volume: 0}, 2000);
+							setTimeout(function(){
+								radio.pause();
+								radio.setAttribute("src", "");
+								setTimeout(function() { 
+									radio.load(); // This stops the stream from downloading
+								});
+							}, 2000);
+							clearInterval(currentlyPlayingTimer);
+							$(".fa-pause-circle").css("display", "none");
+							$(".fa-play-circle").css("display", "initial");
+							$("#equaliser-container").css("opacity", 0);
+							$("#playerInfo").css("transition", "opacity 1s ease");
+							$("#playerInfo").css("opacity", 0);
+							$("#playerAbout").css("animation", "helpMoveClickPause 0.5s ease 1.5s");
+							if ((animationTimerTime) >= 5 && (animationTimerTime <= 10)) {
+								$("#playerClanhouseLogo").css("animation", "playerLogoFadeStopClan 3s");
+								$("#playerJetstreamLogo").css("animation", "playerLogoFadeStopJet 3s 0s");
+							} else {
+								$("#playerClanhouseLogo").css("animation", "playerLogoFadeStop 3s");
+								$("#playerJetstreamLogo").css("animation", "");
+							}
+							playerResizeTimer = setTimeout(function(){
+								$("#playerMiddleLine").css("top", "-24px");
+								$("#playerBottomLine").css("top", "-24px");
+								$("#currentVolume").css("top", "-24px");
+								$("#MagicPlayer").css("height", "76px");
+							}, 1000);
+							playerResizeTimer2 = setTimeout(function(){
+								$("#MagicPlayer").css("width", "228px");
+								$("#playerLogo").css("left", "0px");
+							}, 1500);
+							helpMoveTimer = setTimeout(function(){
+								$("#playerAbout").css("left", "-22px");
+							}, 2000);
+							clearInterval(animationTimer);
+							
+							$(".equaliser-column:nth-child(1) .colour-bar").css("animation", "color-bar-paused 2s 1s ease-out alternate infinite");
+							$(".equaliser-column:nth-child(2) .colour-bar").css("animation", "color-bar-paused 2s 0.5s ease-out alternate infinite");
+							$(".equaliser-column:nth-child(3) .colour-bar").css("animation", "color-bar-paused 2s 1.5s ease-out alternate infinite");
+							$(".equaliser-column:nth-child(4) .colour-bar").css("animation", "color-bar-paused 2s 0.375s ease-out alternate infinite");
+							$(".equaliser-column:nth-child(5) .colour-bar").css("animation", "color-bar-paused 2s 2s ease-out alternate infinite");
+					}
+					
+					function radioPlayerPlay() {
+							clearTimeout(helpMoveTimer);
+							clearTimeout(playerResizeTimer);
+							clearTimeout(playerResizeTimer2);
+							animationTimer = setInterval(currentAnimation, 1000);
+							radio.setAttribute("src", streamURL);
+							radio.load();
+							radio.play();
+							$("#radio").animate({volume: 0}, 0);
+							$("#radio").animate({volume: getVolume()}, 2000);
+							$(".fa-play-circle").css("display", "none");
+							$(".fa-pause-circle").css("display", "initial");
+							$("#playerAbout").css("animation", "helpMoveClickPlay 0.5s ease");
+							$("#playerAbout").css("left", "0px");
+							$("#equaliser-container").css("opacity", 1);
+							$("#MagicPlayer").css("height", "100px");
+							$("#MagicPlayer").css("width", "245px");
+							$("#playerLogo").css("left", "17px");
+							$("#playerMiddleLine").css("top", "0px");
+							$("#playerBottomLine").css("top", "0px");
+							$("#currentVolume").css("top", "0px");
+							$("#playerInfo").css("transition", "opacity 3s ease-in");
+							$("#playerInfo").css("opacity", 1);
+							$("#playerClanhouseLogo").css("animation", "playerLogoFade 10s infinite");
+							$("#playerJetstreamLogo").css("animation", "playerLogoFade 10s 5s infinite");
+							currentlyPlaying();
+							currentlyPlayingTimer = setInterval(currentlyPlaying, 10000);
+							
+							$(".equaliser-column:nth-child(1) .colour-bar").css("animation", "color-bar-playing 2s 1s ease-out alternate infinite");
+							$(".equaliser-column:nth-child(2) .colour-bar").css("animation", "color-bar-playing 2s 0.5s ease-out alternate infinite");
+							$(".equaliser-column:nth-child(3) .colour-bar").css("animation", "color-bar-playing 2s 1.5s ease-out alternate infinite");
+							$(".equaliser-column:nth-child(4) .colour-bar").css("animation", "color-bar-playing 2s 0.375s ease-out alternate infinite");
+							$(".equaliser-column:nth-child(5) .colour-bar").css("animation", "color-bar-playing 2s 2s ease-out alternate infinite");
+					}
+					
+					function setVolume(val) {
+						clearTimeout(fadeoutTimer);
+						radio.volume = val / 100;
+						if (getBoolRememberVolume()) {
+							document.cookie = "savedVolume=" + radio.volume + ";" + expires + ";path=/;Secure";
+						}
+						$("#currentVolume").css("transition", "top 0.5s ease 0s, opacity 0.5s ease 0s");
+						$("#currentVolume").css("opacity", 1);
+						document.getElementById("currentVolume").innerHTML = "Volume: " + val + "%";
+						var fadeoutTimer = setTimeout(function(){
+							$("#currentVolume").css("transition", "top 0.5s ease 0s, opacity 2.5s cubic-bezier(.17,.84,.44,1) 2s");
+							$("#currentVolume").css("opacity", 0);
+						}, 500);
+					}
+					
+					function rememberCheck() {
+						if (rememberVolume.checked){
+							document.cookie = "rememberVolume=1;" + expires + ";path=/;Secure";
+							document.cookie = "savedVolume=" + radio.volume + ";" + expires + ";path=/;Secure";
+						} else {
+							document.cookie = "rememberVolume=0;" + expires + ";path=/;Secure";
+						}
+					}
+					function currentlyPlaying() {
+						
+						var songGetter = "./playing.php" + getTime();
+						$.ajax({
+							url: songGetter,
+							dataType: "text",
+							success: function(currentSong) {
+								$( "#playerInfoPlaying" ).text(currentSong);
+								songToHistory(currentSong);
+							}
+						});
+						
+					}
+					
+					function currentAnimation() {
+						animationTimerTime++;
+						if (animationTimerTime === 10) {
+							animationTimerTime = 0;
+						}
+					}
+					
+					document.getElementById('playerAbout').title = "MagicD3VIL's Radio Player\nLicensed under the Academic Free License version 3.0\nCopyright (c) 2021 Michael Slíva <michael@sliva.dev>";
+				</script>
+			<!-- END MagicD3VIL's Radio Player -->

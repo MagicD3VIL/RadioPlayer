@@ -1,0 +1,185 @@
+/*
+Licensed under the Academic Free License version 3.0
+Copyright (c) 2021 Michael Slíva <michael@sliva.dev>
+*/
+
+html, body {
+	height:100%;
+	width:100%;
+	overflow: hidden;
+	background-color: white;
+	transition: background-color 585ms ease;
+	font-family: 'Lato', 'Exo 2', sans-serif;
+}
+
+#deadCenter {
+	height: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.linkButtons {
+	position: fixed;
+	display: flex;
+	align-items: center;
+	left: 0;
+	bottom: 0;
+	flex-flow: column-reverse;
+}
+
+.linkButtons > div {
+	padding: 0.5rem 0;
+	margin-left: 1.5rem;
+}
+
+.toggleButtons {
+	position: fixed;
+	display: flex;
+	align-items: center;
+	right: 0;
+	bottom: 0;
+	flex-flow: column-reverse;
+}
+
+.toggleButtons > div:first-child, .linkButtons > div:first-child {
+    margin-bottom: 1.5rem;
+}
+
+.toggleButtons > div {
+	padding: 0.5rem 0;
+	margin-right: 1.5rem;
+}
+
+#githubButton {
+	font-size: 2rem;
+	color: #434343;
+	transition: color 585ms ease;
+	padding-bottom: 0;
+}
+
+#darkmodeToggle {
+	font-size: 2rem;
+	color: #434343;
+	transition: color 585ms ease;
+	padding-bottom: 0;
+}
+
+#timerButton {
+	width: 2rem;
+	height: 2rem;
+	fill: #434343;
+	transition: fill 585ms ease;
+}
+
+#historyButton {
+	font-size: 2rem;
+	color: #434343;
+	transition: color 585ms ease;
+}
+
+#downloadButton {
+	font-size: 2rem;
+	color: #434343;
+	transition: color 585ms ease;
+}
+
+.buttonContainer {
+  display: flex;
+  flex-flow: wrap;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal > .buttonContainer > .btn {
+	margin: 1rem 0.25rem 0 0.25rem;
+}
+
+.modal > .buttonContainer > .btn:first-child {
+	margin-left: 0;
+}
+
+.modal > .buttonContainer > .btn:last-child {
+	margin-right: 0;
+}
+
+.btn {
+  text-decoration: none;
+  border: 1px solid black;
+  border-radius: 50px;
+  position: relative;
+  overflow: hidden;
+  font-size: 1rem;
+  padding: 1rem 1rem;
+  color: black;
+  text-transform: uppercase;
+  text-align: center;
+  text-shadow: 2px 2px 4px silver;
+  width: max-content;
+  min-width: 50px;
+  margin-top: 1rem;
+}
+
+.btn:before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+	120deg,
+	transparent,
+	white,
+	transparent
+  );
+  transition: all 650ms;
+}
+
+.btn:hover:before {
+  left: 100%;
+}
+
+.modal > h2 {
+	margin: 0.25rem 0 0 0;
+}
+
+.modal > hr {
+	margin: 0.5rem 0;
+}
+
+.modal > form {
+	padding-top: 0.25rem;
+}
+
+.formColumn {
+	display: flex;
+	align-items: stretch;
+}
+
+.formColumn > .nameColumn {
+	display: flex;
+	flex-flow: column;
+	width: max-content;
+	padding-right: 0.75rem;
+	align-self: center;
+}
+
+.formColumn > .nameColumn > label {
+	margin-top: 0.5rem;
+	height: 22px;
+}
+
+.formColumn > .inputColumn {
+	display: flex;
+	flex-flow: column;
+	width: 100%;
+}
+
+.formColumn > .inputColumn > input {
+	margin-top: 0.5rem;
+	height: 16px;
+	border: solid 1px black;
+	padding: 2px;
+	border-radius: 0.5rem;
+}
