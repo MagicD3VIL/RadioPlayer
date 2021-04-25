@@ -74,7 +74,7 @@ Copyright (c) 2021 Michael Slíva <michael@sliva.dev>
 					}
 					
 					function songToHistory(song) {
-						if ((song !== "") && (song !== undefined) && !(song.includes("Warning:") || song.includes("Error:"))) {
+						if ((song !== "") && (song !== undefined) && !(song.includes("<b>Warning</b>:") || song.includes("<b>Error</b>:"))) {
 							if (history[0] != song) {
 								for (var i = 8; i >= 0; i--) {
 									history[i+1] = history[i];
