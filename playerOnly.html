@@ -214,18 +214,18 @@ Copyright (c) 2021 Michael Slíva <michael@sliva.dev>
 							document.cookie = "rememberVolume=0;" + expires + ";path=/;Secure";
 						}
 					}
+					
 					function currentlyPlaying() {
-						
 						var songGetter = "./playing.php" + getTime();
 						$.ajax({
 							url: songGetter,
 							dataType: "text",
 							success: function(currentSong) {
+								currentSong = currentSong.replaceAll('&amp;', '&');
 								$( "#playerInfoPlaying" ).text(currentSong);
 								songToHistory(currentSong);
 							}
 						});
-						
 					}
 					
 					function currentAnimation() {
