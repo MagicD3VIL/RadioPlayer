@@ -3,6 +3,10 @@ Licensed under the Academic Free License version 3.0
 Copyright (c) 2021 Michael Slíva <michael@sliva.dev>
 */
 
+#volume {
+	width: 160px;
+}
+
 #soundlist {
 	display: flex;
 	justify-content: center;
@@ -398,4 +402,3 @@ input[type=range]:focus::-ms-fill-upper {
     margin: 0;
   }
 }
-	
