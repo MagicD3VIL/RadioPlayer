@@ -8,4 +8,4 @@ A fully responsive HTML5 online radio player using jQuery.
 Live Demo: https://sliva.dev/radio/
 
 ***Note:***
-*This radio player uses a text file (not audio stream metadata) in order to display the currently playing song.*
+*This radio player uses an API (not audio stream metadata) in order to display the currently playing song.*
