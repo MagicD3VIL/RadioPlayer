@@ -222,6 +222,17 @@ Copyright (c) 2021 Michael Slíva <michael@sliva.dev>
 							dataType: "text",
 							success: function(currentSong) {
 								currentSong = currentSong.replaceAll('&amp;', '&');
+								// sanitize the song name for XSS injection in case it's not properly sanitized by the API
+								currentSong = currentSong.replaceAll('<', '&lt;');
+								currentSong = currentSong.replaceAll('>', '&gt;');
+								currentSong = currentSong.replaceAll('"', '&quot;');
+								currentSong = currentSong.replaceAll('\'', '&#39;');
+								currentSong = currentSong.replaceAll('/', '&#x2F;');
+								currentSong = currentSong.replaceAll('\\', '&#x5C;');
+								currentSong = currentSong.replaceAll('\n', '<br>');
+								currentSong = currentSong.replaceAll('\r', '<br>');
+								// sanitized
+								currentSong = currentSong.replaceAll('\t', '&nbsp;&nbsp;&nbsp;&nbsp;');
 								$( "#playerInfoPlaying" ).text(currentSong);
 								songToHistory(currentSong);
 							}
