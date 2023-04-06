@@ -245,6 +245,21 @@ Copyright (c) 2021 Michael Slíva <michael@sliva.dev>
 							animationTimerTime = 0;
 						}
 					}
+
+					/* MediaSession support */
+					try {
+						navigator.mediaSession.setActionHandler('play', function() {
+							radioPlayerPlay();
+						});
+						navigator.mediaSession.setActionHandler('pause', function() {
+							radioPlayerPause();
+						});
+						navigator.mediaSession.setActionHandler('stop', function() {
+								radioPlayerPause();
+						});
+					} catch(error) {
+						log('Warning! Media session actions are not supported.' + error.message);
+					}
 					
 					document.getElementById('playerAbout').title = "MagicD3VIL's Radio Player\nLicensed under the Academic Free License version 3.0\nCopyright (c) 2021 Michael Slíva <michael@sliva.dev>";
 				</script>
