@@ -1,6 +1,9 @@
 /*
 Copyright (C) 2021 Michael Slíva <michael@sliva.dev>
 Licensed under the Academic Free License version 3.0
+
+You should have received a copy of the Academic Free License version 3.0 
+along with this program. If not, see <https://spdx.org/licenses/AFL-3.0.html>.
 */
 
 if (!jQuery) throw new Error("jQuery is not loaded!");
