@@ -165,7 +165,7 @@ function setVolume(val) {
   clearTimeout(fadeoutTimer);
   radio.volume = val / 100;
   if (IsRememberVolume()) {
-    document.cookie = "savedVolume=" + radio.volume + ";" + expires + ";path=/;Secure";
+    document.cookie = "savedVolume=" + radio.volume + ";" + expires + ";path=/;SameSite=Strict;Secure";
   }
   $("#currentVolume").css("transition", "top 0.5s ease 0s, opacity 0.5s ease 0s");
   $("#currentVolume").css("opacity", 1);
@@ -178,10 +178,10 @@ function setVolume(val) {
 
 function rememberCheck() {
   if (checkboxRememberVolume.checked){
-    document.cookie = "rememberVolume=1;" + expires + ";path=/;Secure";
-    document.cookie = "savedVolume=" + radio.volume + ";" + expires + ";path=/;Secure";
+    document.cookie = "rememberVolume=1;" + expires + ";path=/;SameSite=Strict;Secure";
+    document.cookie = "savedVolume=" + radio.volume + ";" + expires + ";path=/;SameSite=Strict;Secure";
   } else {
-    document.cookie = "rememberVolume=0;" + expires + ";path=/;Secure";
+    document.cookie = "rememberVolume=0;" + expires + ";path=/;SameSite=Strict;Secure";
   }
 }
 

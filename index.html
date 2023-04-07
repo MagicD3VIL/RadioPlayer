@@ -33,7 +33,7 @@ along with this program. If not, see <https://spdx.org/licenses/AFL-3.0.html>.
 					<div id="playerMiddleLine"><p id="radioPlayer"><i onclick="radioPlayerPlay()" class="fa fa-play-circle"></i><i onclick="radioPlayerPause()" class="fa fa-pause-circle"></i><span class="span8">&nbsp;</span><input id="volume" type="range" min="0" max="100" step="1" oninput="setVolume(this.value)" onchange="setVolume(this.value)"><span class="span8">&nbsp;</span> 
 					<div id="equaliser-container"> <ol class="equaliser-column"> <li class="colour-bar"></li> </ol> <ol class="equaliser-column"> <li class="colour-bar"></li> </ol> <ol class="equaliser-column"> <li class="colour-bar"></li> </ol> <ol class="equaliser-column"> <li class="colour-bar"></li> </ol> <ol class="equaliser-column"> <li class="colour-bar"></li> </ol></div>
 					<span class="rememberHelp" id="playerAbout" title="MagicD3VIL's Radio Player"><i style ="font-size:1rem" class="far fa-question-circle"></i></span></div><div id="currentVolume"></div>
-					<div id="playerBottomLine"><p id="playerRememberHelp"><span class="rememberHelp" title="If you check this box, next time when you load or refresh this page your set volume will remain the same."><input type="checkbox" id="rememberVolume" onclick="rememberCheck()"/> Remember volume</span></p><div id="playerLogo"><p id="playerClanhouseLogo"><a href="https://clanhouse.eu" target="_blank"><img src="./clanhouse_24x28.png" alt="Clanhouse.eu Logo"></a></p><p id="playerJetstreamLogo"><a href="https://jetstreamradio.com/" target="_blank"><img src="./jetstream_28x28.png" alt="JetStream Radio Logo"></a></p></div>
+					<div id="playerBottomLine"><p id="playerRememberHelp"><span class="rememberHelp" title="If you check this box, next time when you load or refresh this page your set volume will remain the same.&#10;&#13;By checking this box you agree to the use of cookies."><input type="checkbox" id="rememberVolume" onclick="rememberCheck()"/> Remember volume</span></p><div id="playerLogo"><p id="playerClanhouseLogo"><a href="https://clanhouse.eu" target="_blank"><img src="./clanhouse_24x28.png" alt="Clanhouse.eu Logo"></a></p><p id="playerJetstreamLogo"><a href="https://jetstreamradio.com/" target="_blank"><img src="./jetstream_28x28.png" alt="JetStream Radio Logo"></a></p></div>
 					<audio id="radio" preload="none">Your browser does not support <code>&lt;audio&gt;</code> element</audio></div>
 				</div>
 			<!-- END MagicD3VIL's Radio Player -->
@@ -45,7 +45,7 @@ along with this program. If not, see <https://spdx.org/licenses/AFL-3.0.html>.
 		</div>
 		
 		<div class="toggleButtons">
-			<div title="Darkmode" id="darkmodeToggle"><i onclick="setDarkmode()" class="fas fa-lightbulb"></i></div>
+			<div title="Darkmode&#10;&#13;By clicking this button you agree to the use of cookies." id="darkmodeToggle"><i onclick="setDarkmode()" class="fas fa-lightbulb"></i></div>
 			<div title="Download the m3u file for your own player" id="downloadButton"><i onclick='window.open("https://listen.jetstreamradio.com:8000/autodj.m3u", "_blank");' class="fas fa-download"></i></div>
 			<div title="History" id="historyButton"><i onclick="historyModalOpen()" class="fas fa-history"></i></div>
 			<div title="Timer"><svg id="timerButton" onclick="timerModalOpen()" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M6.5 0a.5.5 0 0 0 0 1H7v1.07a7.001 7.001 0 0 0-3.273 12.474l-.602.602a.5.5 0 0 0 .707.708l.746-.746A6.97 6.97 0 0 0 8 16a6.97 6.97 0 0 0 3.422-.892l.746.746a.5.5 0 0 0 .707-.708l-.601-.602A7.001 7.001 0 0 0 9 2.07V1h.5a.5.5 0 0 0 0-1h-3zm1.038 3.018a6.093 6.093 0 0 1 .924 0 6 6 0 1 1-.924 0zM8.5 5.5a.5.5 0 0 0-1 0v3.362l-1.429 2.38a.5.5 0 1 0 .858.515l1.5-2.5A.5.5 0 0 0 8.5 9V5.5zM0 3.5c0 .753.333 1.429.86 1.887A8.035 8.035 0 0 1 4.387 1.86 2.5 2.5 0 0 0 0 3.5zM13.5 1c-.753 0-1.429.333-1.887.86a8.035 8.035 0 0 1 3.527 3.527A2.5 2.5 0 0 0 13.5 1z"/></svg></div>
@@ -116,7 +116,7 @@ along with this program. If not, see <https://spdx.org/licenses/AFL-3.0.html>.
 							$("#timerButton").css("fill", "#FFD034");
 							$("#downloadButton").css("color", "#FFD034");
 							$("#MagicPlayer").css("border-color", "transparent");
-							document.cookie = "darkmode=" + 1 + ";" + expires + ";path=/;Secure";
+							document.cookie = "darkmode=" + 1 + ";" + expires + ";path=/;SameSite=Strict;Secure";
 						}
 						else {
 							$("html").css("background-color", "white");
@@ -127,7 +127,7 @@ along with this program. If not, see <https://spdx.org/licenses/AFL-3.0.html>.
 							$("#timerButton").css("fill", "#585858");	
 							$("#downloadButton").css("color", "#585858");	
 							$("#MagicPlayer").css("border-color", "initial");
-							document.cookie = "darkmode=" + 0 + ";" + expires + ";path=/;Secure";
+							document.cookie = "darkmode=" + 0 + ";" + expires + ";path=/;SameSite=Strict;Secure";
 						}
 					}
 					
