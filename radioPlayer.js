@@ -8,11 +8,12 @@ along with this program. If not, see <https://spdx.org/licenses/AFL-3.0.html>.
 
 if (!jQuery) throw new Error("jQuery is not loaded!");
 
-const rememberVolume = document.getElementById("rememberVolume");
+const checkboxRememberVolume = document.getElementById("rememberVolume");
 const radio = document.getElementById("radio");	
 const streamURL = "https://listen.jetstreamradio.com:8000/autodj";
+const radioAPIEndpointURL = './playing.php'; // using a local intermediary instead of using API endpoint directly because of CORS protection
 
-var helpMoveTimer;
+var playerPositionTimer;
 var playerResizeTimer;
 var playerResizeTimer2;
 var currentlyPlayingTimer;
@@ -48,7 +49,7 @@ function getCookieValue(cname) {
   return "";
 }
 
-function getBoolRememberVolume() {
+function IsRememberVolume() {
   var result = Number(getCookieValue("rememberVolume"));
   if (result == 1) {
     return true;
@@ -58,22 +59,22 @@ function getBoolRememberVolume() {
 }
 
 function resetVolume() {
-  if (!getBoolRememberVolume()){
+  if (!IsRememberVolume()){
     radio.volume = 0.25;
     document.getElementById("volume").value = "25";
-    rememberVolume.checked = false;
+    checkboxRememberVolume.checked = false;
   } else {
     var savedVolume = Number(getCookieValue("savedVolume"));
     radio.volume = savedVolume;
     document.getElementById("volume").value = String(savedVolume * 100);
-    rememberVolume.checked = true;
+    checkboxRememberVolume.checked = true;
   }
 }
 
 resetVolume();
 
 function getVolume() {
-  if (!getBoolRememberVolume()){
+  if (!IsRememberVolume()){
     return 0.25;
   } else {
     return Number(getCookieValue("savedVolume"));
@@ -113,7 +114,7 @@ function radioPlayerPause() {
       $("#MagicPlayer").css("width", "228px");
       $("#playerLogo").css("left", "0px");
     }, 1500);
-    helpMoveTimer = setTimeout(function(){
+    playerPositionTimer = setTimeout(function(){
       $("#playerAbout").css("left", "-22px");
     }, 2000);
     clearInterval(animationTimer);
@@ -126,7 +127,7 @@ function radioPlayerPause() {
 }
 
 function radioPlayerPlay() {
-    clearTimeout(helpMoveTimer);
+    clearTimeout(playerPositionTimer);
     clearTimeout(playerResizeTimer);
     clearTimeout(playerResizeTimer2);
     animationTimer = setInterval(currentAnimation, 1000);
@@ -163,7 +164,7 @@ function radioPlayerPlay() {
 function setVolume(val) {
   clearTimeout(fadeoutTimer);
   radio.volume = val / 100;
-  if (getBoolRememberVolume()) {
+  if (IsRememberVolume()) {
     document.cookie = "savedVolume=" + radio.volume + ";" + expires + ";path=/;Secure";
   }
   $("#currentVolume").css("transition", "top 0.5s ease 0s, opacity 0.5s ease 0s");
@@ -176,7 +177,7 @@ function setVolume(val) {
 }
 
 function rememberCheck() {
-  if (rememberVolume.checked){
+  if (checkboxRememberVolume.checked){
     document.cookie = "rememberVolume=1;" + expires + ";path=/;Secure";
     document.cookie = "savedVolume=" + radio.volume + ";" + expires + ";path=/;Secure";
   } else {
@@ -185,7 +186,7 @@ function rememberCheck() {
 }
 
 function currentlyPlaying() {
-  var songGetter = "./playing.php" + getTime();
+  var songGetter = radioAPIEndpointURL + getTime();
   $.ajax({
     url: songGetter,
     dataType: "text",
@@ -203,7 +204,7 @@ function currentlyPlaying() {
       currentSong = currentSong.replaceAll('\t', '&nbsp;&nbsp;&nbsp;&nbsp;');
       // sanitized
       $( "#playerInfoPlaying" ).html(currentSong);
-      songToHistory(currentSong);
+      if (typeof songToHistory == 'function') songToHistory(currentSong); // standalone player does not contain this function, only available on full player page
     }
   });
 }

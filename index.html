@@ -57,12 +57,12 @@ along with this program. If not, see <https://spdx.org/licenses/AFL-3.0.html>.
 			<!-- HISTORY -->
 				<script>
 					let history = new Array(9);
-					let historyStamp = new Array(9);
+					let historyTimestamp = new Array(9);
 					
 					function printHistory() {
 						var historyHTML = "";
 						for (var i = 0; (i < 10) && (i <= history.length) && (history[i] !== undefined); i++) {
-							historyHTML += "<p>" + historyStamp[i] + history[i] + "</p>";
+							historyHTML += "<p>" + historyTimestamp[i] + history[i] + "</p>";
 							
 						}
 						
@@ -81,11 +81,11 @@ along with this program. If not, see <https://spdx.org/licenses/AFL-3.0.html>.
 							if (history[0] != song) {
 								for (var i = 8; i >= 0; i--) {
 									history[i+1] = history[i];
-									historyStamp[i+1] = historyStamp[i];
+									historyTimestamp[i+1] = historyTimestamp[i];
 								}
 								var timestamp = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', hour12: false});
 								history[0] = song;
-								historyStamp[0] = "<code>" + timestamp + "</code> | ";
+								historyTimestamp[0] = "<code>" + timestamp + "</code> | ";
 								printHistory();
 							}
 						}
