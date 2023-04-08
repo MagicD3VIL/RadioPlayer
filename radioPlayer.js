@@ -98,11 +98,11 @@ function radioPlayerPause() {
     $("#playerInfo").css("opacity", 0);
     $("#playerAbout").css("animation", "helpMoveClickPause 0.5s ease 1.5s");
     if ((animationTimerTime) >= 5 && (animationTimerTime <= 10)) {
-      $("#playerClanhouseLogo").css("animation", "playerLogoFadeStopClan 3s");
-      $("#playerJetstreamLogo").css("animation", "playerLogoFadeStopJet 3s 0s");
+      $("#playerProviderLogo").css("animation", "playerLogoFadeStopClan 3s");
+      $("#playerRadioStationLogo").css("animation", "playerLogoFadeStopJet 3s 0s");
     } else {
-      $("#playerClanhouseLogo").css("animation", "playerLogoFadeStop 3s");
-      $("#playerJetstreamLogo").css("animation", "");
+      $("#playerProviderLogo").css("animation", "playerLogoFadeStop 3s");
+      $("#playerRadioStationLogo").css("animation", "");
     }
     playerResizeTimer = setTimeout(function(){
       $("#playerMiddleLine").css("top", "-24px");
@@ -149,8 +149,8 @@ function radioPlayerPlay() {
     $("#currentVolume").css("top", "0px");
     $("#playerInfo").css("transition", "opacity 3s ease-in");
     $("#playerInfo").css("opacity", 1);
-    $("#playerClanhouseLogo").css("animation", "playerLogoFade 10s infinite");
-    $("#playerJetstreamLogo").css("animation", "playerLogoFade 10s 5s infinite");
+    $("#playerProviderLogo").css("animation", "playerLogoFade 10s infinite");
+    $("#playerRadioStationLogo").css("animation", "playerLogoFade 10s 5s infinite");
     currentlyPlaying();
     currentlyPlayingTimer = setInterval(currentlyPlaying, 10000);
     
